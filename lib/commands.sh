@@ -40,8 +40,8 @@ cmd_new() {
         return 1
     fi
 
-    local path
-    path="$(ccp_profile_path "$name")"
+    local profile_file
+    profile_file="$(ccp_profile_path "$name")"
 
     echo -e "\n${BOLD}Creating profile '$name'${RESET}"
     echo -e "${DIM}Press Enter to leave blank (system default will be used)${RESET}\n"
@@ -115,9 +115,9 @@ cmd_new() {
         [[ -n "$model_sonnet"  ]] && echo "ANTHROPIC_DEFAULT_SONNET_MODEL=$model_sonnet"
         [[ -n "$model_haiku"   ]] && echo "ANTHROPIC_DEFAULT_HAIKU_MODEL=$model_haiku"
         for v in "${extra_vars[@]}"; do echo "$v"; done
-    } > "$path"
+    } > "$profile_file"
 
-    ok "Profile '$name' created at $path"
+    ok "Profile '$name' created at $profile_file"
 
     printf "\nSet as default? ${DIM}[y/N]${RESET}: "
     read -r ans
@@ -185,8 +185,9 @@ cmd_use() {
 }
 
 cmd_run() {
-    local name="$1"; shift
+    local name="$1"
     [[ -z "$name" ]] && { err "Usage: ccp run <name> [command...]"; return 1; }
+    shift
     ccp_profile_exists "$name" || { err "Profile '$name' not found."; return 1; }
 
     local env_args=()
@@ -236,17 +237,17 @@ cmd_doctor() {
         echo -e "${DIM}  No profiles to validate.${RESET}"
     else
         for p in "${profiles[@]}"; do
-            local path issues=()
-            path="$(ccp_profile_path "$p")"
+            local profile_file issues=()
+            profile_file="$(ccp_profile_path "$p")"
 
             local cdir
-            cdir=$(grep '^CLAUDE_CONFIG_DIR=' "$path" 2>/dev/null | cut -d= -f2-)
+            cdir=$(grep '^CLAUDE_CONFIG_DIR=' "$profile_file" 2>/dev/null | cut -d= -f2-)
             cdir="${cdir/#\~/$HOME}"
             [[ -n "$cdir" && ! -d "$cdir" ]] && issues+=("CLAUDE_CONFIG_DIR '$cdir' does not exist (will be created by Claude Code)")
 
             if [[ ${#issues[@]} -eq 0 ]]; then
                 local base_url
-                base_url=$(grep '^ANTHROPIC_BASE_URL=' "$path" 2>/dev/null | cut -d= -f2-)
+                base_url=$(grep '^ANTHROPIC_BASE_URL=' "$profile_file" 2>/dev/null | cut -d= -f2-)
                 printf "  ${GREEN}✓${RESET} %-20s" "$p"
                 [[ -n "$base_url" ]] && printf " ${DIM}[$base_url]${RESET}"
                 echo

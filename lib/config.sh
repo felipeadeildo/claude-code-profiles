@@ -32,9 +32,9 @@ info() { echo -e "${CYAN}→${RESET} $*"; }
 
 # Load profile vars, expanding ~ in values
 ccp_load_vars() {
-    local path
-    path="$(ccp_profile_path "$1")"
-    grep -v '^\s*#' "$path" | grep -v '^\s*$' | while IFS= read -r line; do
+    local profile_file
+    profile_file="$(ccp_profile_path "$1")"
+    grep -v '^\s*#' "$profile_file" | grep -v '^\s*$' | while IFS= read -r line; do
         local key val
         key="${line%%=*}"
         val="${line#*=}"
