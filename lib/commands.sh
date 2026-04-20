@@ -43,13 +43,12 @@ cmd_new() {
     local profile_file
     profile_file="$(ccp_profile_path "$name")"
 
+    local config_dir="$CCP_DIR/config/$name"
+
     echo -e "\n${BOLD}Creating profile '$name'${RESET}"
-    echo -e "${DIM}Press Enter to leave blank (system default will be used)${RESET}\n"
+    echo -e "${DIM}Config dir: $config_dir${RESET}\n"
 
-    printf "Claude config dir ${DIM}(e.g. ~/.claude-work)${RESET}: "
-    read -r config_dir
-
-    echo -e "\n${DIM}Popular providers:${RESET}"
+    echo -e "${DIM}Popular providers:${RESET}"
     echo -e "  ${DIM}1) Anthropic (default)     uses ANTHROPIC_API_KEY${RESET}"
     echo -e "  ${DIM}2) OpenRouter              uses ANTHROPIC_API_KEY${RESET}"
     echo -e "  ${DIM}3) z.ai (GLM)              uses ANTHROPIC_AUTH_TOKEN${RESET}"
@@ -106,7 +105,7 @@ cmd_new() {
         echo "# Profile: $name"
         echo "# Created: $(date '+%Y-%m-%d %H:%M')"
         echo
-        [[ -n "$config_dir"    ]] && echo "CLAUDE_CONFIG_DIR=$config_dir"
+        echo "CLAUDE_CONFIG_DIR=$config_dir"
         [[ -n "$base_url"      ]] && echo "ANTHROPIC_BASE_URL=$base_url"
         [[ "$auth_var" == "ollama" ]] && echo "ANTHROPIC_API_KEY=" && echo "ANTHROPIC_AUTH_TOKEN=ollama"
         [[ "$auth_var" == "ANTHROPIC_API_KEY"    && -n "$api_key"    ]] && echo "ANTHROPIC_API_KEY=$api_key"
