@@ -43,7 +43,7 @@ cmd_new() {
     local profile_file
     profile_file="$(ccp_profile_path "$name")"
 
-    local config_dir="$CCP_DIR/config/$name"
+    local config_dir="$CCP_DIR/data/$name"
 
     echo -e "\n${BOLD}Creating profile '$name'${RESET}"
     echo -e "${DIM}Config dir: $config_dir${RESET}\n"
@@ -116,6 +116,7 @@ cmd_new() {
         for v in "${extra_vars[@]}"; do echo "$v"; done
     } > "$profile_file"
 
+    mkdir -p "$config_dir"
     ok "Profile '$name' created at $profile_file"
 
     printf "\nSet as default? ${DIM}[y/N]${RESET}: "

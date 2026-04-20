@@ -40,12 +40,12 @@ Example profile:
 
 ```bash
 # ~/.ccp/profiles/work.env
-CLAUDE_CONFIG_DIR=~/.ccp/config/work
+CLAUDE_CONFIG_DIR=~/.ccp/data/work
 ANTHROPIC_BASE_URL=https://openrouter.ai/api
 ANTHROPIC_API_KEY=sk-or-...
 ```
 
-`CLAUDE_CONFIG_DIR` is set automatically to `~/.ccp/config/<name>`: fully isolated settings, history, and todos per profile. Override it by editing the profile file directly.
+`CLAUDE_CONFIG_DIR` is set automatically to `~/.ccp/data/<name>`: fully isolated settings, history, and todos per profile. Override it by editing the profile file directly.
 
 ## Commands
 
