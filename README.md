@@ -96,3 +96,37 @@ The wizard asks for these optionally when creating a profile.
 `ccp use` exports vars into your current shell, which only works if the script is sourced, not executed as a subprocess. That's why `install.sh` adds a `source` line to your shell rc file (`~/.bashrc`, `~/.zshrc`, etc.).
 
 `ccp <profile>` and `ccp run` spawn a subprocess, so no sourcing needed. Vars are scoped to that command only.
+
+## Updating
+
+```bash
+ccp update    # downloads and installs the latest release
+ccp version   # show current version
+```
+
+## Development
+
+Requirements: `bash`, `git`, `make`, `curl`, `unzip`.
+
+```bash
+git clone https://github.com/felipeadeildo/claude-code-profiles
+cd claude-code-profiles
+make install        # installs from local source
+```
+
+Releasing a new version:
+
+```bash
+# 1. make your changes with conventional commits
+#    feat: ...   fix: ...   docs: ...
+
+# 2. bump the version
+make bump-patch     # 0.1.0 -> 0.1.1
+make bump-minor     # 0.1.0 -> 0.2.0
+make bump-major     # 0.1.0 -> 1.0.0
+
+# 3. tag and push
+make release
+git push origin main --tags
+# GitHub Actions creates the release automatically via git-cliff
+```
