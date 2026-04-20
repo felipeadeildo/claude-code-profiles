@@ -262,6 +262,48 @@ cmd_doctor() {
     echo
 }
 
+cmd_version() {
+    echo "ccp v${CCP_VERSION}"
+}
+
+cmd_update() {
+    local api_url="https://api.github.com/repos/${CCP_REPO}/releases/latest"
+    info "Checking for updates..."
+
+    local latest
+    latest=$(curl -sf "$api_url" | grep '"tag_name"' | cut -d'"' -f4)
+
+    if [[ -z "$latest" ]]; then
+        err "Could not reach GitHub. Check your connection."
+        return 1
+    fi
+
+    local latest_ver="${latest#v}"
+    if [[ "$latest_ver" == "$CCP_VERSION" ]]; then
+        ok "Already up to date (v${CCP_VERSION})."
+        return
+    fi
+
+    info "New version available: ${latest} (current: v${CCP_VERSION})"
+
+    local zip_url="https://github.com/${CCP_REPO}/archive/refs/tags/${latest}.zip"
+    local tmp_dir
+    tmp_dir="$(mktemp -d)"
+
+    info "Downloading ${latest}..."
+    curl -sL "$zip_url" -o "$tmp_dir/ccp.zip" || { err "Download failed."; rm -rf "$tmp_dir"; return 1; }
+
+    unzip -q "$tmp_dir/ccp.zip" -d "$tmp_dir" || { err "Failed to extract zip."; rm -rf "$tmp_dir"; return 1; }
+
+    local extracted
+    extracted="$(ls -d "$tmp_dir"/claude-code-profiles-*/)"
+
+    bash "${extracted}install.sh" || { err "Install failed."; rm -rf "$tmp_dir"; return 1; }
+
+    rm -rf "$tmp_dir"
+    ok "Updated to ${latest}. Restart your shell or run: source ~/.bashrc"
+}
+
 cmd_help() {
     echo -e "
 ${BOLD}ccp${RESET} - Claude Code Profiles
@@ -276,6 +318,8 @@ ${BOLD}Commands:${RESET}
   ${CYAN}ccp run${RESET} <profile> <cmd...>      run a command with profile vars
   ${CYAN}ccp default${RESET} [profile]           set the default profile (used when running bare 'ccp')
   ${CYAN}ccp doctor${RESET}                      validate all profiles
+  ${CYAN}ccp version${RESET}                     show current version
+  ${CYAN}ccp update${RESET}                      update to the latest release
 
 ${BOLD}Shorthand:${RESET}
   ${CYAN}ccp <profile>${RESET}                   launch claude with that profile's vars

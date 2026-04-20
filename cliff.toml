@@ -1,0 +1,30 @@
+[changelog]
+header = "# Changelog\n"
+body = """
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group }}
+{% for commit in commits %}
+- {{ commit.message | split(pat="\n") | first | trim }}\
+{% if commit.breaking %} (**breaking**){% endif %}
+
+{% endfor %}
+{% endfor %}
+"""
+trim = true
+footer = ""
+
+[git]
+conventional_commits = true
+filter_unconventional = true
+split_commits = false
+
+commit_parsers = [
+  { message = "^feat",     group = "Features" },
+  { message = "^fix",      group = "Bug Fixes" },
+  { message = "^docs",     group = "Documentation" },
+  { message = "^refactor", group = "Refactoring" },
+  { message = "^chore",    skip = true },
+]
+
+filter_commits = true
+tag_pattern = "v[0-9].*"

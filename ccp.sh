@@ -27,8 +27,10 @@ _ccp_main() {
         use)           cmd_use "$@" ;;
         run|exec)      cmd_run "$@" ;;
         default)       cmd_default "$@" ;;
-        doctor)        cmd_doctor ;;
-        help|--help|-h) cmd_help ;;
+        doctor)           cmd_doctor ;;
+        version|--version) cmd_version ;;
+        update)           cmd_update ;;
+        help|--help|-h)   cmd_help ;;
         *)
             if ccp_profile_exists "$cmd"; then
                 cmd_run "$cmd" "$@"
