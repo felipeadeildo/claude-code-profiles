@@ -1,8 +1,17 @@
-# ccp - Claude Code Profiles
+<div align="center">
 
-Switch between Claude Code setups with a single command. Different accounts, different providers, different models, each in its own profile.
+  <img src="banner.png" alt="ccp - Claude Code Profiles" width="400" />
 
-No dependencies. Pure bash.
+  <h1>ccp: Claude Code Profiles</h1>
+
+  <p>Switch between Claude Code setups with a single command. Different accounts, different providers, different models: each in its own profile.</p>
+
+  <p>No dependencies. Pure bash.</p>
+
+  [![Version](https://img.shields.io/github/v/release/felipeadeildo/claude-code-profiles?label=version&color=58a6ff)](https://github.com/felipeadeildo/claude-code-profiles/releases/latest)
+  [![License](https://img.shields.io/github/license/felipeadeildo/claude-code-profiles?color=3fb950)](LICENSE)
+
+</div>
 
 ## Install
 
@@ -10,7 +19,7 @@ No dependencies. Pure bash.
 git clone https://github.com/felipeadeildo/claude-code-profiles
 cd claude-code-profiles
 bash install.sh
-source ~/.bashrc   # or ~/.zshrc, ~/.config/fish/config.fish, etc.
+source ~/.bashrc   # or ~/.zshrc
 ```
 
 ## Quickstart
@@ -21,11 +30,11 @@ ccp work           # launch claude with that profile
 ccp use work       # or: export its vars into your current shell
 ```
 
-That's it. `ccp new` asks for provider, API key, and model mapping.
+`ccp new` asks for provider, API key, and model mapping. That's it.
 
 ## How profiles work
 
-A profile is a `.env` file under `~/.ccp/profiles/`. You name it whatever you want.
+A profile is a `.env` file under `~/.ccp/profiles/`. Each profile gets an isolated `CLAUDE_CONFIG_DIR`: separate settings, history, and todos.
 
 ```
 ~/.ccp/
@@ -33,7 +42,8 @@ A profile is a `.env` file under `~/.ccp/profiles/`. You name it whatever you wa
     work.env
     personal.env
     openrouter.env
-  config
+  config          # stores default profile name
+  data/           # isolated CLAUDE_CONFIG_DIR per profile
 ```
 
 Example profile:
@@ -45,13 +55,11 @@ ANTHROPIC_BASE_URL=https://openrouter.ai/api
 ANTHROPIC_API_KEY=sk-or-...
 ```
 
-`CLAUDE_CONFIG_DIR` is set automatically to `~/.ccp/data/<name>`: fully isolated settings, history, and todos per profile. Override it by editing the profile file directly.
-
 ## Commands
 
 ```
-ccp new <profile>          create a profile (interactive)
 ccp list                   list all profiles
+ccp new <profile>          create a profile (interactive)
 ccp show <profile>         show vars (keys masked)
 ccp edit <profile>         open in $EDITOR
 ccp remove <profile>       delete a profile
@@ -62,20 +70,24 @@ ccp run <profile> <cmd>    run any command with profile vars
 
 ccp default [profile]      get or set the default profile
 ccp doctor                 validate all profiles
+ccp version                show current version
+ccp update                 update to the latest release
 ```
 
-`ccp use` vs `ccp <profile>`: use `use` when you want the vars to stick in your shell session. Use the shorthand when you just want to launch claude once.
+**`ccp use` vs `ccp <profile>`**: use `use` when you want vars to stick in your shell session. Use the shorthand to launch claude once.
+
+**Default profile**: `ccp default work` makes `work` the profile used when you run bare `ccp`.
 
 ## Providers
 
-| Provider       | `ANTHROPIC_BASE_URL`                  | Auth                    |
-|----------------|---------------------------------------|-------------------------|
-| Anthropic      | (leave blank)                         | `ANTHROPIC_API_KEY`     |
-| OpenRouter     | `https://openrouter.ai/api`           | `ANTHROPIC_API_KEY`     |
-| z.ai (GLM)     | `https://api.z.ai/api/anthropic`      | `ANTHROPIC_AUTH_TOKEN`  |
-| Kimi           | `https://api.moonshot.ai/anthropic`   | `ANTHROPIC_AUTH_TOKEN`  |
-| DeepSeek       | `https://api.deepseek.com/anthropic`  | `ANTHROPIC_AUTH_TOKEN`  |
-| Ollama (local) | `http://localhost:11434`              | `ANTHROPIC_AUTH_TOKEN=ollama` |
+| Provider       | `ANTHROPIC_BASE_URL`                   | Auth                          |
+|----------------|----------------------------------------|-------------------------------|
+| Anthropic      | (leave blank)                          | `ANTHROPIC_API_KEY`           |
+| OpenRouter     | `https://openrouter.ai/api`            | `ANTHROPIC_API_KEY`           |
+| z.ai (GLM)     | `https://api.z.ai/api/anthropic`       | `ANTHROPIC_AUTH_TOKEN`        |
+| Kimi           | `https://api.moonshot.ai/anthropic`    | `ANTHROPIC_AUTH_TOKEN`        |
+| DeepSeek       | `https://api.deepseek.com/anthropic`   | `ANTHROPIC_AUTH_TOKEN`        |
+| Ollama (local) | `http://localhost:11434`               | `ANTHROPIC_AUTH_TOKEN=ollama` |
 
 z.ai, Kimi, and DeepSeek use `ANTHROPIC_AUTH_TOKEN` instead of `ANTHROPIC_API_KEY`. The wizard sets the right var automatically.
 
@@ -93,9 +105,9 @@ The wizard asks for these optionally when creating a profile.
 
 ## `ccp use` requires sourcing
 
-`ccp use` exports vars into your current shell, which only works if the script is sourced, not executed as a subprocess. That's why `install.sh` adds a `source` line to your shell rc file (`~/.bashrc`, `~/.zshrc`, etc.).
+`ccp use` exports vars into your current shell, which only works if the script is sourced. That's why `install.sh` adds a `source` line to your shell rc file.
 
-`ccp <profile>` and `ccp run` spawn a subprocess, so no sourcing needed. Vars are scoped to that command only.
+`ccp <profile>` and `ccp run` spawn a subprocess: vars are scoped to that command only.
 
 ## Updating
 
@@ -103,6 +115,8 @@ The wizard asks for these optionally when creating a profile.
 ccp update    # downloads and installs the latest release
 ccp version   # show current version
 ```
+
+ccp checks for updates in the background on each invocation and notifies you when a new version is available.
 
 ## Development
 
