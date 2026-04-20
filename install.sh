@@ -17,7 +17,7 @@ echo "Installing ccp to $INSTALL_DIR..."
 mkdir -p "$INSTALL_DIR"
 mkdir -p "$INSTALL_DIR/ccp-lib"
 
-cp -r "$SCRIPT_DIR/lib" "$INSTALL_DIR/ccp-lib"
+cp -r "$SCRIPT_DIR/lib/." "$INSTALL_DIR/ccp-lib"
 sed "s|lib/config.sh|ccp-lib/config.sh|; s|lib/commands.sh|ccp-lib/commands.sh|" \
     "$SCRIPT_DIR/ccp.sh" > "$INSTALL_DIR/ccp"
 chmod +x "$INSTALL_DIR/ccp"

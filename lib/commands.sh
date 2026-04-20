@@ -139,7 +139,7 @@ cmd_show() {
     while IFS= read -r line; do
         if [[ "$line" =~ ^# ]] || [[ -z "$line" ]]; then
             echo -e "  ${DIM}${line}${RESET}"
-        elif [[ "$line" =~ API_KEY|AUTH_TOKEN ]]; then
+        elif [[ "$line" =~ (API_KEY|AUTH_TOKEN) ]]; then
             local key val
             key="${line%%=*}"; val="${line#*=}"
             echo -e "  ${YELLOW}${key}${RESET}=${DIM}$(mask_key "$val")${RESET}"
