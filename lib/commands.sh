@@ -274,7 +274,7 @@ ${BOLD}Commands:${RESET}
   ${CYAN}ccp remove${RESET} <profile>            delete a profile
   ${CYAN}ccp use${RESET} <profile>               export profile vars into current shell
   ${CYAN}ccp run${RESET} <profile> <cmd...>      run a command with profile vars
-  ${CYAN}ccp default${RESET} [profile]           get or set the default profile
+  ${CYAN}ccp default${RESET} [profile]           set the default profile (used when running bare 'ccp')
   ${CYAN}ccp doctor${RESET}                      validate all profiles
 
 ${BOLD}Shorthand:${RESET}
@@ -285,9 +285,10 @@ ${BOLD}Shorthand:${RESET}
   It is never a built-in keyword.
 
 ${BOLD}Examples:${RESET}
+  ccp                                 # launch claude with the default profile
   ccp work                            # launch claude as 'work'
-  ccp openrouter                      # launch claude as 'openrouter'
   ccp run work python script.py       # run something else with 'work' vars
+  ccp default work                    # set 'work' as default
 
 ${BOLD}Config dir:${RESET} ${CCP_DIR}
 "

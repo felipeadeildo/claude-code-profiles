@@ -13,7 +13,9 @@ source "$_CCP_SCRIPT_DIR/lib/commands.sh"
 
 _ccp_main() {
     ccp_init
-    local cmd="${1:-help}"
+    local default_profile
+    default_profile="$(ccp_get_default)"
+    local cmd="${1:-${default_profile:-help}}"
     shift 2>/dev/null || true
 
     case "$cmd" in
