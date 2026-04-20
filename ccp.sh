@@ -13,6 +13,7 @@ source "$_CCP_SCRIPT_DIR/lib/commands.sh"
 
 _ccp_main() {
     ccp_init
+    _ccp_schedule_update_check
     local default_profile
     default_profile="$(ccp_get_default)"
     local cmd="${1:-${default_profile:-help}}"
