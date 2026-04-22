@@ -6,10 +6,10 @@
 #   echo 'source ~/.local/bin/ccp' >> ~/.bashrc   # or ~/.zshrc (required for `ccp use`)
 #   source ~/.bashrc
 
-_CCP_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")" && pwd)"
+_CCP_HOME="${CCP_HOME:-$HOME/.ccp}"
 
-source "$_CCP_SCRIPT_DIR/lib/config.sh"
-source "$_CCP_SCRIPT_DIR/lib/commands.sh"
+source "$_CCP_HOME/bin/lib/config.sh"
+source "$_CCP_HOME/bin/lib/commands.sh"
 
 _ccp_main() {
     ccp_init
