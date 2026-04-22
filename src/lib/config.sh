@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Paths and shared utilities
 
-CCP_VERSION="0.1.2"
+CCP_VERSION="0.1.0"
 CCP_REPO="felipeadeildo/claude-code-profiles"
 
 CCP_DIR="${CCP_DIR:-$HOME/.ccp}"
