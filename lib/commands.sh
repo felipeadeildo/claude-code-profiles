@@ -336,8 +336,9 @@ cmd_update() {
 
     local extracted
     extracted="$(ls -d "$tmp_dir"/claude-code-profiles-*/)"
+    extracted="${extracted%/}"
 
-    bash "${extracted}install.sh" || { err "Install failed."; rm -rf "$tmp_dir"; return 1; }
+    bash "${extracted}/install.sh" || { err "Install failed."; rm -rf "$tmp_dir"; return 1; }
 
     rm -rf "$tmp_dir"
     ok "Updated to ${latest}. Restart your shell or run: source ~/.bashrc"
