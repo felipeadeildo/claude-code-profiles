@@ -34,7 +34,12 @@ _ccp_main() {
         *)
             if ccp_profile_exists "$cmd"; then
                 _ccp_schedule_update_check
-                cmd_run "$cmd" "$@"
+                cmd_launch "$cmd" "$@"
+            elif [[ "$cmd" == -* ]]; then
+                _ccp_schedule_update_check
+                local profile="${default_profile}"
+                [[ -z "$profile" ]] && { err "No default profile set. Run: ccp default <name>"; return 1; }
+                cmd_launch "$profile" "$cmd" "$@"
             else
                 err "Unknown command: '$cmd'"
                 cmd_help

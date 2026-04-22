@@ -211,24 +211,36 @@ _ccp_schedule_update_check() {
     _ccp_notify_update
 }
 
+_ccp_load_env_args() {
+    local name="$1"
+    _env_args=()
+    while IFS= read -r line; do
+        local key val
+        key="${line%%=*}"; val="${line#*=}"
+        val="${val/#\~/$HOME}"
+        _env_args+=("$key=$val")
+    done < <(ccp_load_vars "$name")
+}
+
+cmd_launch() {
+    local name="$1"
+    [[ -z "$name" ]] && { err "Usage: ccp <profile> [claude_flags...]"; return 1; }
+    shift
+    ccp_profile_exists "$name" || { err "Profile '$name' not found."; return 1; }
+    _ccp_load_env_args "$name"
+    env "${_env_args[@]}" claude "$@"
+}
+
 cmd_run() {
     local name="$1"
     [[ -z "$name" ]] && { err "Usage: ccp run <name> [command...]"; return 1; }
     shift
     ccp_profile_exists "$name" || { err "Profile '$name' not found."; return 1; }
-
-    local env_args=()
-    while IFS= read -r line; do
-        local key val
-        key="${line%%=*}"; val="${line#*=}"
-        val="${val/#\~/$HOME}"
-        env_args+=("$key=$val")
-    done < <(ccp_load_vars "$name")
-
+    _ccp_load_env_args "$name"
     if [[ $# -eq 0 ]]; then
-        env "${env_args[@]}" claude
+        env "${_env_args[@]}" claude
     else
-        env "${env_args[@]}" "$@"
+        env "${_env_args[@]}" "$@"
     fi
 }
 
