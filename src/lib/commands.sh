@@ -7,7 +7,7 @@ cmd_list() {
     default="$(ccp_get_default)"
 
     while IFS= read -r f; do
-        profiles+=("$(basename "$f" .env)")
+        profiles+=("${f##*/}"); profiles[-1]="${profiles[-1]%.env}"
     done < <(find "$CCP_PROFILES_DIR" -name '*.env' | sort)
 
     if [[ ${#profiles[@]} -eq 0 ]]; then
@@ -269,7 +269,7 @@ cmd_doctor() {
 
     local profiles=()
     while IFS= read -r f; do
-        profiles+=("$(basename "$f" .env)")
+        profiles+=("${f##*/}"); profiles[-1]="${profiles[-1]%.env}"
     done < <(find "$CCP_PROFILES_DIR" -name '*.env' | sort)
 
     if [[ ${#profiles[@]} -eq 0 ]]; then
@@ -328,20 +328,23 @@ cmd_update() {
     local zip_url="https://github.com/${CCP_REPO}/archive/refs/tags/${latest}.zip"
     local tmp_dir
     tmp_dir="$(mktemp -d)"
+    trap 'rm -rf "$tmp_dir"' RETURN
 
     info "Downloading ${latest}..."
-    curl -sL "$zip_url" -o "$tmp_dir/ccp.zip" || { err "Download failed."; rm -rf "$tmp_dir"; return 1; }
+    curl -sL "$zip_url" -o "$tmp_dir/ccp.zip" || { err "Download failed."; return 1; }
 
-    unzip -q "$tmp_dir/ccp.zip" -d "$tmp_dir" || { err "Failed to extract zip."; rm -rf "$tmp_dir"; return 1; }
+    unzip -q "$tmp_dir/ccp.zip" -d "$tmp_dir" || { err "Failed to extract zip."; return 1; }
 
-    local extracted
-    extracted="$(ls -d "$tmp_dir"/claude-code-profiles-*/)"
-    extracted="${extracted%/}"
+    local extracted=("$tmp_dir"/claude-code-profiles-*/)
+    bash "${extracted[0]%/}/install.sh" || { err "Install failed."; return 1; }
 
-    bash "${extracted}/install.sh" || { err "Install failed."; rm -rf "$tmp_dir"; return 1; }
-
-    rm -rf "$tmp_dir"
-    ok "Updated to ${latest}. Restart your shell or run: source ~/.bashrc"
+    local rc
+    case "${SHELL##*/}" in
+        zsh)  rc="$HOME/.zshrc" ;;
+        fish) rc="${XDG_CONFIG_HOME:-$HOME/.config}/fish/config.fish" ;;
+        *)    rc="$HOME/.bashrc" ;;
+    esac
+    ok "Updated to ${latest}. Restart your shell or run: source $rc"
 }
 
 cmd_help() {

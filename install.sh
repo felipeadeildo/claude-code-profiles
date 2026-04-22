@@ -18,10 +18,9 @@ esac
 
 _install_from_repo_root() {
     local root="$1"
-    mkdir -p "$BIN_DIR/lib"
-    cp "$root/src/ccp.sh"          "$BIN_DIR/ccp"
-    cp "$root/src/lib/config.sh"   "$BIN_DIR/lib/config.sh"
-    cp "$root/src/lib/commands.sh" "$BIN_DIR/lib/commands.sh"
+    mkdir -p "$BIN_DIR"
+    cp -r "$root/src/lib" "$BIN_DIR/"
+    cp "$root/src/ccp.sh" "$BIN_DIR/ccp"
     chmod +x "$BIN_DIR/ccp"
 }
 
@@ -44,8 +43,8 @@ else
         -o "$tmp_dir/ccp.zip"
     unzip -q "$tmp_dir/ccp.zip" -d "$tmp_dir"
 
-    extracted="$(ls -d "$tmp_dir"/claude-code-profiles-*/)"
-    _install_from_repo_root "${extracted%/}"
+    local extracted=("$tmp_dir"/claude-code-profiles-*/)
+    _install_from_repo_root "${extracted[0]%/}"
 fi
 
 SOURCE_LINE="source \"$BIN_DIR/ccp\""
