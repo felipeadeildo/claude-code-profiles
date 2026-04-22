@@ -184,32 +184,6 @@ cmd_use() {
     ok "Profile '$name' active in current session."
 }
 
-_ccp_update_cache="$CCP_DIR/update-check"
-
-_ccp_check_update_bg() {
-    local latest
-    latest=$(curl -sf "https://api.github.com/repos/${CCP_REPO}/releases/latest" | grep '"tag_name"' | cut -d'"' -f4)
-    [[ -n "$latest" ]] && echo "$latest" > "$_ccp_update_cache"
-}
-
-_ccp_notify_update() {
-    [[ ! -f "$_ccp_update_cache" ]] && return
-    local latest
-    latest=$(cat "$_ccp_update_cache")
-    local latest_ver="${latest#v}"
-    [[ "$latest_ver" == "$CCP_VERSION" ]] && return
-    echo -e "${YELLOW}update available: ${latest} (current: v${CCP_VERSION}). Run 'ccp update'${RESET}" >&2
-}
-
-_ccp_schedule_update_check() {
-    local cache="$_ccp_update_cache"
-    # check at most once every 24h
-    if [[ ! -f "$cache" ]] || [[ $(find "$cache" -mmin +1440 2>/dev/null) ]]; then
-        _ccp_check_update_bg &>/dev/null &
-        disown 2>/dev/null || true
-    fi
-    _ccp_notify_update
-}
 
 _ccp_load_env_args() {
     local name="$1"
