@@ -11,20 +11,24 @@ cmd_list() {
     done < <(find "$CCP_PROFILES_DIR" -name '*.env' | sort)
 
     if [[ ${#profiles[@]} -eq 0 ]]; then
-        echo -e "${DIM}No profiles yet. Run: ccp new <name>${RESET}"
+        echo -e "\n${DIM}No profiles yet. Run: ccp new <name>${RESET}\n"
         return
     fi
 
     echo
     for p in "${profiles[@]}"; do
-        local marker="  " extra=""
-        [[ "$p" == "$default" ]] && marker="${GREEN}* ${RESET}" && extra=" ${DIM}(default)${RESET}"
+        local profile_path marker tag provider=""
+        profile_path="$(ccp_profile_path "$p")"
+        marker="  "
+        tag=""
+
+        [[ "$p" == "$default" ]] && marker="${GREEN}*${RESET} " && tag=" ${DIM}default${RESET}"
 
         local base_url
-        base_url=$(grep '^ANTHROPIC_BASE_URL=' "$(ccp_profile_path "$p")" 2>/dev/null | cut -d= -f2-)
-        [[ -n "$base_url" ]] && extra="$extra ${DIM}[$base_url]${RESET}"
+        base_url=$(grep '^ANTHROPIC_BASE_URL=' "$profile_path" 2>/dev/null | cut -d= -f2-)
+        [[ -n "$base_url" ]] && provider=" ${DIM}→ ${base_url}${RESET}"
 
-        echo -e "  ${marker}${BOLD}${p}${RESET}${extra}"
+        echo -e "  ${marker}${BOLD}${p}${RESET}${tag}${provider}"
     done
     echo
 }
@@ -232,14 +236,19 @@ cmd_default() {
 
 cmd_doctor() {
     ccp_init
-    echo -e "\n${BOLD}ccp doctor${RESET}\n"
+    echo -e "\n${BOLD}Dependencies${RESET}\n"
 
-    for dep in claude env grep sed; do
-        command -v "$dep" &>/dev/null \
-            && echo -e "  ${GREEN}✓${RESET} $dep" \
-            || echo -e "  ${RED}✗${RESET} $dep not found"
+    local all_ok=true
+    for dep in claude curl unzip; do
+        if command -v "$dep" &>/dev/null; then
+            echo -e "  ${GREEN}✓${RESET} $dep"
+        else
+            echo -e "  ${RED}✗${RESET} $dep ${DIM}(not found)${RESET}"
+            all_ok=false
+        fi
     done
-    echo
+
+    echo -e "\n${BOLD}Profiles${RESET}\n"
 
     local profiles=()
     while IFS= read -r f; do
@@ -247,8 +256,10 @@ cmd_doctor() {
     done < <(find "$CCP_PROFILES_DIR" -name '*.env' | sort)
 
     if [[ ${#profiles[@]} -eq 0 ]]; then
-        echo -e "${DIM}  No profiles to validate.${RESET}"
+        echo -e "  ${DIM}No profiles found. Run: ccp new <name>${RESET}"
     else
+        local default
+        default="$(ccp_get_default)"
         for p in "${profiles[@]}"; do
             local profile_file issues=()
             profile_file="$(ccp_profile_path "$p")"
@@ -256,16 +267,19 @@ cmd_doctor() {
             local cdir
             cdir=$(grep '^CLAUDE_CONFIG_DIR=' "$profile_file" 2>/dev/null | cut -d= -f2-)
             cdir="${cdir/#\~/$HOME}"
-            [[ -n "$cdir" && ! -d "$cdir" ]] && issues+=("CLAUDE_CONFIG_DIR '$cdir' does not exist (will be created by Claude Code)")
+            [[ -n "$cdir" && ! -d "$cdir" ]] && issues+=("config dir missing — will be created on first launch")
+
+            local tag=""
+            [[ "$p" == "$default" ]] && tag=" ${DIM}default${RESET}"
+
+            local base_url provider=""
+            base_url=$(grep '^ANTHROPIC_BASE_URL=' "$profile_file" 2>/dev/null | cut -d= -f2-)
+            [[ -n "$base_url" ]] && provider=" ${DIM}→ ${base_url}${RESET}"
 
             if [[ ${#issues[@]} -eq 0 ]]; then
-                local base_url
-                base_url=$(grep '^ANTHROPIC_BASE_URL=' "$profile_file" 2>/dev/null | cut -d= -f2-)
-                printf "  ${GREEN}✓${RESET} %-20s" "$p"
-                [[ -n "$base_url" ]] && printf " ${DIM}[$base_url]${RESET}"
-                echo
+                echo -e "  ${GREEN}✓${RESET} ${BOLD}${p}${RESET}${tag}${provider}"
             else
-                printf "  ${YELLOW}⚠${RESET} %-20s\n" "$p"
+                echo -e "  ${YELLOW}⚠${RESET} ${BOLD}${p}${RESET}${tag}${provider}"
                 for issue in "${issues[@]}"; do
                     echo -e "      ${DIM}→ $issue${RESET}"
                 done
