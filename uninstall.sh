@@ -14,8 +14,8 @@ esac
 
 # Remove installed files
 rm -f "$INSTALL_DIR/ccp"
-rm -rf "$INSTALL_DIR/ccp-lib"
-echo "Removed $INSTALL_DIR/ccp and $INSTALL_DIR/ccp-lib"
+rm -rf "$INSTALL_DIR/ccp-src"
+echo "Removed $INSTALL_DIR/ccp and $INSTALL_DIR/ccp-src"
 
 # Remove source line from rc file
 if [[ -f "$RC" ]] && grep -qF "ccp" "$RC"; then

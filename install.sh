@@ -26,23 +26,21 @@ case "${SHELL##*/}" in
 esac
 
 _install_from_dir() {
-    local src="$1"
-    cp -r "$src/lib/." "$INSTALL_DIR/ccp-lib"
-    sed "s|lib/config.sh|ccp-lib/config.sh|; s|lib/commands.sh|ccp-lib/commands.sh|" \
-        "$src/ccp.sh" > "$INSTALL_DIR/ccp"
+    local repo_root="$1"
+    cp -r "$repo_root/src/." "$INSTALL_DIR/ccp-src"
+    ln -sf "$INSTALL_DIR/ccp-src/ccp.sh" "$INSTALL_DIR/ccp"
 }
 
 echo "Installing ccp to $INSTALL_DIR..."
-mkdir -p "$INSTALL_DIR/ccp-lib"
+mkdir -p "$INSTALL_DIR/ccp-src"
 
 if [[ -n "$SRC_DIR" ]]; then
     _install_from_dir "$SRC_DIR"
 else
     local_dir="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" 2>/dev/null && pwd)" || local_dir=""
-    if [[ -f "$local_dir/ccp.sh" && -d "$local_dir/lib" ]]; then
+    if [[ -d "$local_dir/src" ]]; then
         _install_from_dir "$local_dir"
     else
-        # Download latest release zip
         api_url="https://api.github.com/repos/${REPO}/releases/latest"
         latest=$(curl -sf "$api_url" | grep '"tag_name"' | cut -d'"' -f4)
         [[ -z "$latest" ]] && { echo "error: could not reach GitHub" >&2; exit 1; }
@@ -61,7 +59,7 @@ else
     fi
 fi
 
-chmod +x "$INSTALL_DIR/ccp"
+chmod +x "$INSTALL_DIR/ccp-src/ccp.sh"
 
 SOURCE_LINE="source \"$INSTALL_DIR/ccp\""
 if ! grep -qF "$SOURCE_LINE" "$RC" 2>/dev/null; then
