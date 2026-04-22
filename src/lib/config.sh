@@ -50,3 +50,11 @@ mask_key() {
     local val="$1"
     [[ ${#val} -gt 8 ]] && echo "${val:0:4}...${val: -4}" || echo "****"
 }
+
+ccp_shell_rc() {
+    case "${SHELL##*/}" in
+        zsh)  echo "$HOME/.zshrc" ;;
+        fish) echo "${XDG_CONFIG_HOME:-$HOME/.config}/fish/config.fish" ;;
+        *)    echo "$HOME/.bashrc" ;;
+    esac
+}

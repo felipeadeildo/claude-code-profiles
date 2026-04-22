@@ -44,6 +44,7 @@ else
     unzip -q "$tmp_dir/ccp.zip" -d "$tmp_dir"
 
     local extracted=("$tmp_dir"/claude-code-profiles-*/)
+    [[ -d "${extracted[0]}" ]] || { echo "error: extraction failed" >&2; exit 1; }
     _install_from_repo_root "${extracted[0]%/}"
 fi
 
