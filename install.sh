@@ -27,8 +27,10 @@ esac
 
 _install_from_dir() {
     local repo_root="$1"
-    cp -r "$repo_root/src/." "$INSTALL_DIR/ccp-src"
-    ln -sf "$INSTALL_DIR/ccp-src/ccp.sh" "$INSTALL_DIR/ccp"
+    cp -r "$repo_root/src/lib/." "$INSTALL_DIR/ccp-src"
+    sed "s|lib/config.sh|ccp-src/config.sh|; s|lib/commands.sh|ccp-src/commands.sh|" \
+        "$repo_root/src/ccp.sh" > "$INSTALL_DIR/ccp"
+    chmod +x "$INSTALL_DIR/ccp"
 }
 
 echo "Installing ccp to $INSTALL_DIR..."
@@ -59,7 +61,6 @@ else
     fi
 fi
 
-chmod +x "$INSTALL_DIR/ccp-src/ccp.sh"
 
 SOURCE_LINE="source \"$INSTALL_DIR/ccp\""
 if ! grep -qF "$SOURCE_LINE" "$RC" 2>/dev/null; then
