@@ -16,9 +16,7 @@
 ## Install
 
 ```bash
-git clone https://github.com/felipeadeildo/claude-code-profiles
-cd claude-code-profiles
-bash install.sh
+curl -fsSL https://raw.githubusercontent.com/felipeadeildo/claude-code-profiles/main/install.sh | bash
 source ~/.bashrc   # or ~/.zshrc
 ```
 
