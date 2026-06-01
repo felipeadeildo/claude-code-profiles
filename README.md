@@ -1,7 +1,4 @@
 <div align="center">
-
-  <img src="banner.png" alt="ccp - Claude Code Profiles" width="400" />
-
   <h1>ccp: Claude Code Profiles</h1>
 
   <p>Switch between Claude Code setups with a single command.<br>Different accounts, different providers, different models — each in its own profile.</p>
@@ -18,7 +15,7 @@
 ## Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/felipeadeildo/claude-code-profiles/main/install.sh | bash
+curl -fsSL https://ccp.fa.dev.br/install.sh | bash
 ```
 
 Then reload your shell:
