@@ -10,10 +10,11 @@ CCP_HOME="${CCP_HOME:-$HOME/.ccp}"
 BIN_DIR="$CCP_HOME/bin"
 REPO="felipeadeildo/claude-code-profiles"
 
-case "${SHELL##*/}" in
-    zsh)  RC="$HOME/.zshrc" ;;
-    fish) RC="${XDG_CONFIG_HOME:-$HOME/.config}/fish/config.fish" ;;
-    *)    RC="$HOME/.bashrc" ;;
+_CURRENT_SHELL="${SHELL##*/}"
+
+case "$_CURRENT_SHELL" in
+    zsh) RC="$HOME/.zshrc" ;;
+    *)   RC="$HOME/.bashrc" ;;
 esac
 
 _install_from_repo_root() {
@@ -22,6 +23,13 @@ _install_from_repo_root() {
     cp -r "$root/src/lib" "$BIN_DIR/"
     cp "$root/src/ccp.sh" "$BIN_DIR/ccp"
     chmod +x "$BIN_DIR/ccp"
+
+    if [[ "$_CURRENT_SHELL" == "fish" ]]; then
+        local fish_conf_dir="${XDG_CONFIG_HOME:-$HOME/.config}/fish/conf.d"
+        mkdir -p "$fish_conf_dir"
+        cp "$root/src/fish/ccp.fish" "$fish_conf_dir/ccp.fish"
+        echo "Installed fish function to $fish_conf_dir/ccp.fish"
+    fi
 }
 
 local_dir="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" 2>/dev/null && pwd)" || local_dir=""
@@ -48,10 +56,13 @@ else
     _install_from_repo_root "${extracted[0]%/}"
 fi
 
-SOURCE_LINE="source \"$BIN_DIR/ccp\""
-if ! grep -qF "$SOURCE_LINE" "$RC" 2>/dev/null; then
-    printf '\n# ccp - Claude Code Profiles\n%s\n' "$SOURCE_LINE" >> "$RC"
-    echo "Added source line to $RC"
+if [[ "$_CURRENT_SHELL" == "fish" ]]; then
+    echo "Done. Open a new fish shell or run: source ${XDG_CONFIG_HOME:-$HOME/.config}/fish/conf.d/ccp.fish"
+else
+    SOURCE_LINE="source \"$BIN_DIR/ccp\""
+    if ! grep -qF "$SOURCE_LINE" "$RC" 2>/dev/null; then
+        printf '\n# ccp - Claude Code Profiles\n%s\n' "$SOURCE_LINE" >> "$RC"
+        echo "Added source line to $RC"
+    fi
+    echo "Done. Run: source $RC"
 fi
-
-echo "Done. Run: source $RC"

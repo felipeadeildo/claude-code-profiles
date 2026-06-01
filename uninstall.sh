@@ -5,17 +5,23 @@ set -e
 
 CCP_HOME="${CCP_HOME:-$HOME/.ccp}"
 BIN_DIR="$CCP_HOME/bin"
+_CURRENT_SHELL="${SHELL##*/}"
 
-case "${SHELL##*/}" in
-    zsh)  RC="$HOME/.zshrc" ;;
-    fish) RC="${XDG_CONFIG_HOME:-$HOME/.config}/fish/config.fish" ;;
-    *)    RC="$HOME/.bashrc" ;;
+case "$_CURRENT_SHELL" in
+    zsh) RC="$HOME/.zshrc" ;;
+    *)   RC="$HOME/.bashrc" ;;
 esac
 
 rm -rf "$BIN_DIR"
 echo "Removed $BIN_DIR"
 
-if [[ -f "$RC" ]]; then
+if [[ "$_CURRENT_SHELL" == "fish" ]]; then
+    fish_fn="${XDG_CONFIG_HOME:-$HOME/.config}/fish/conf.d/ccp.fish"
+    if [[ -f "$fish_fn" ]]; then
+        rm "$fish_fn"
+        echo "Removed $fish_fn"
+    fi
+elif [[ -f "$RC" ]]; then
     sed -i '/# ccp - Claude Code Profiles/d' "$RC"
     sed -i "\|source.*\.ccp/bin/ccp|d" "$RC"
     echo "Removed source line from $RC"

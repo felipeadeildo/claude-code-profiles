@@ -6,7 +6,7 @@
 
   <p>Switch between Claude Code setups with a single command.<br>Different accounts, different providers, different models — each in its own profile.</p>
 
-  <p>No dependencies. Pure bash.</p>
+  <p>No dependencies. Works with bash, zsh, and fish.</p>
 
   [![Version](https://img.shields.io/github/v/release/felipeadeildo/claude-code-profiles?label=version&color=58a6ff)](https://github.com/felipeadeildo/claude-code-profiles/releases/latest)
   [![License](https://img.shields.io/github/license/felipeadeildo/claude-code-profiles?color=3fb950)](LICENSE)
@@ -19,8 +19,17 @@
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/felipeadeildo/claude-code-profiles/main/install.sh | bash
-source ~/.zshrc   # or ~/.bashrc
 ```
+
+Then reload your shell:
+
+| Shell | Command |
+|-------|---------|
+| bash  | `source ~/.bashrc` |
+| zsh   | `source ~/.zshrc` |
+| fish  | `source ~/.config/fish/conf.d/ccp.fish` |
+
+The installer detects your shell automatically. For fish, it installs a native `ccp.fish` function to `~/.config/fish/conf.d/` — no need to source anything on the next shell launch.
 
 ## Quickstart
 
